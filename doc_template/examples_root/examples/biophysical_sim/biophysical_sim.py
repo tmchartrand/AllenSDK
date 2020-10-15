@@ -1,3 +1,4 @@
+#%%
 from allensdk.model.biophysical import runner
 import json
 import os
@@ -75,7 +76,7 @@ def copytree(src, dst, symlinks=False, ignore=None):
 cell_id = 468193142  # get this from the web site: http://celltypes.brain-map.org
 sweep_num = 46  # Select a Long Square sweep :  1s DC
 
-#%% Download all-acive model
+#%% Download all-active model
 
 sdk_model_templates = {'all_active': 491455321, 'perisomatic': 329230710}
 bp = BiophysicalApi()
@@ -85,24 +86,18 @@ model_dict = model_list[0]
 
 model_dir = 'all_active_models'
 bp.cache_data(model_dict['id'], working_directory=model_dir)
-new_model_file = 'fit_parameters_new.json'
-shutil.copyfile(new_model_file, os.path.join(model_dir, new_model_file))
-copytree('modfiles', os.path.join(model_dir, 'modfiles'))
+#%% Provide the path to a new all-active model also
+
+# new_model_file = 'fit_parameters_new.json'
+# shutil.copyfile(new_model_file, os.path.join(model_dir, new_model_file))
+# copytree('modfiles', os.path.join(model_dir, 'modfiles'))
 
 #%% Running the legacy all-active models
 
 os.chdir(model_dir)
 subprocess.check_call(['nrnivmodl', 'modfiles/'])
-manifest_file = 'manifest.json'
-manifest_dict = json.load(open(manifest_file))
 
-# sweeps by type is not populated when the model is downloaded using the api
-# in that case add the sweep type to the manifest
-if 'sweeps_by_type' not in manifest_dict['runs'][0]:
-    manifest_dict['runs'][0]['sweeps_by_type'] = {"Long Square": [sweep_num]}
-json.dump(manifest_dict, open(manifest_file, 'w'), indent=2)
-
-schema_legacy = dict(manifest_file=manifest_file)
+schema_legacy = dict(manifest_file='manifest.json')
 runner.run(schema_legacy, procs=1, sweeps=[sweep_num])
 
 #%% Running the new all-active models

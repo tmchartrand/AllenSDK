@@ -37,7 +37,7 @@ from allensdk.api.queries.rma_template import RmaTemplate
 from allensdk.api.cache import cacheable
 import os
 import simplejson as json
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 from allensdk.config.manifest import Manifest
 
 
@@ -215,12 +215,15 @@ class BiophysicalApi(RmaTemplate):
                                         self.ids['stimulus'][str(well_known_file['id'])] = \
                                             "%d.nwb" % (ephys_result['id'])
 
-                    self.sweeps = [sweep['sweep_number']
-                                   for sweep in specimen['ephys_sweeps']
+                    sweep_entries = [sweep for sweep in specimen['ephys_sweeps']
                                    if sweep['stimulus_name'] != 'Test']
+                    self.sweeps = [sweep['sweep_number'] for sweep in sweep_entries]
+                    self.sweeps_by_type = defaultdict(list)
+                    for sweep in sweep_entries:
+                        self.sweeps_by_type[sweep['stimulus_name']].append(sweep['sweep_number'])
 
         return self.ids
-
+        
     def is_well_known_file_type(self, wkf, name):
         '''Check if a structure has the expected name.
 
@@ -260,7 +263,8 @@ class BiophysicalApi(RmaTemplate):
                         stimulus_filename='',
                         swc_morphology_path='',
                         marker_path='',
-                        sweeps=[]):
+                        sweeps=[],
+                        sweeps_by_type={}):
         '''Generate a json configuration file with parameters for a
         a biophysical experiment.
 
@@ -281,7 +285,8 @@ class BiophysicalApi(RmaTemplate):
             'model_type': model_type
         }]
         self.manifest['runs'] = [{
-            'sweeps': sweeps
+            'sweeps': sweeps,
+            'sweeps_by_type': sweeps_by_type,
         }]
         self.manifest['neuron'] = [{
             'hoc': ['stdgui.hoc', 'import3d.hoc']
@@ -383,7 +388,8 @@ class BiophysicalApi(RmaTemplate):
                              stimulus_filename,
                              swc_morphology_path,
                              marker_path,
-                             sweeps)
+                             sweeps,
+                             self.sweeps_by_type)
 
         manifest_path = os.path.join(working_directory, 'manifest.json')
         with open(manifest_path, 'w') as f:
