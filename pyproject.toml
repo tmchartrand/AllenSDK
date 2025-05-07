@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "allensdk"
+version = "2.16.2"
+authors = [
+    { name = "Allen Institute for Brain Science", email = "instituteci@alleninstitute.org" },
+]
+description = "Core libraries for the Allen SDK."
+readme = "README.md" # Assuming you might add a README.md
+license = { text = "Allen Institute Software License - This software license is the 2-clause BSD license plus a third clause that prohibits redistribution for commercial purposes without further permission. See LICENSE.txt for full details." }
+keywords = ["neuroscience", "bioinformatics", "scientific"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "License :: Other/Proprietary License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8", # Added based on common practice, adjust if needed
+    "Programming Language :: Python :: 3.9", # Added based on common practice, adjust if needed
+    "Programming Language :: Python :: 3.10", # Added based on common practice, adjust if needed
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
+
+dependencies = [
+    "numpy",
+    "six<2.0.0,>=1.9.0",
+    "simplejson<4.0.0,>=3.10.0",
+    "pandas"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/AllenInstitute/AllenSDK"
+"Bug Tracker" = "https://github.com/AllenInstitute/AllenSDK/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["allensdk*"]
+exclude = ["tests*", "docs*"]
+
